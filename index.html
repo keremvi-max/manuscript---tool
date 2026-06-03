@@ -421,7 +421,11 @@ function buildImgPrompt() {
 }
 
 async function stream(messages, titleText) {
+  // Lock UI during processing
   document.getElementById('lp').style.opacity = '.35';
+  document.querySelectorAll('.tab').forEach(t => t.style.pointerEvents = 'none');
+  document.getElementById('btnText') && (document.getElementById('btnText').disabled = true);
+  document.getElementById('btnImg') && (document.getElementById('btnImg').disabled = true);
   document.getElementById('out').classList.add('vis');
   document.getElementById('outTitle').innerHTML = titleText;
   document.getElementById('search-links').innerHTML = '';
@@ -448,7 +452,7 @@ async function stream(messages, titleText) {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
+        model: 'claude-haiku-4-5',
         max_tokens: 1500,
         messages
       })
@@ -471,6 +475,10 @@ async function stream(messages, titleText) {
   }
 
   document.getElementById('lp').style.opacity = '1';
+  // Unlock UI
+  document.querySelectorAll('.tab').forEach(t => t.style.pointerEvents = 'auto');
+  document.getElementById('btnText') && (document.getElementById('btnText').disabled = false);
+  if (imgBase64) document.getElementById('btnImg') && (document.getElementById('btnImg').disabled = false);
 }
 
 async function doTextSearch() {
