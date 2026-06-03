@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ספר עברי קדום</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ספר עברי">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1A1008">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231A1008'/><text y='.9em' font-size='80' x='10'>📜</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Heebo:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1A1008;--inks:#3D2B10;--cr:#FFFDF5;--g:#B8860B;--gl:#D4A843;--gp:#F0E4C0;--gb:#FFF8E0;--rd:#8B1A1A;--br:#C8A84A;--sh:rgba(100,60,10,0.12);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Heebo",sans-serif;background:var(--cr);color:var(--ink);direction:rtl;min-height:100vh;}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at 15% 15%,rgba(184,134,11,0.07),transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(139,26,26,0.05),transparent 50%);pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:30px 18px 80px;}
+
+header{text-align:center;margin-bottom:20px;}
+.orn{font-size:20px;color:var(--g);margin-bottom:6px;letter-spacing:6px;}
+h1{font-family:"Frank Ruhl Libre",serif;font-size:clamp(20px,5vw,34px);font-weight:900;line-height:1.2;margin-bottom:5px;}
+h1 em{color:var(--g);font-style:normal;}
+.sub{font-size:12px;color:var(--inks);line-height:1.7;max-width:560px;margin:0 auto 10px;}
+.src-grid{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;}
+.src-tag{background:var(--gp);border:1px solid var(--br);border-radius:14px;padding:3px 9px;font-size:10px;color:var(--inks);}
+
+/* MODE TABS */
+.modes{display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(--br);}
+.mode{flex:1;padding:10px 16px;border:none;font-family:"Frank Ruhl Libre",serif;font-size:13px;font-weight:700;cursor:pointer;background:#EDE5CF;color:#5A4A2A;transition:all .18s;position:relative;bottom:-2px;}
+.mode:first-child{border-radius:10px 0 0 0;}
+.mode:last-child{border-radius:0 10px 0 0;}
+.mode.on{background:var(--ink);color:var(--gl);bottom:0;}
+.mode:not(.on):hover{background:#E0D4B8;}
+
+/* SEARCH CARD */
+.sc{background:#fff;border:2px solid var(--br);border-radius:0 0 14px 14px;padding:18px 20px;box-shadow:0 4px 20px var(--sh);margin-bottom:16px;}
+.sl{font-family:"Frank Ruhl Libre",serif;font-size:13px;font-weight:700;color:var(--inks);margin-bottom:8px;display:block;}
+.sr{display:flex;gap:8px;}
+.si{flex:1;padding:12px 14px;border:2px solid var(--br);border-radius:9px;font-family:"Heebo",sans-serif;font-size:14px;direction:rtl;background:var(--gp);color:var(--ink);outline:none;transition:all .2s;}
+.si:focus{border-color:var(--g);background:#fff;box-shadow:0 0 0 3px rgba(184,134,11,0.1);}
+.si::placeholder{color:#9A7A3A;opacity:.75;}
+.bs{padding:12px 22px;background:var(--ink);color:var(--gl);border:none;border-radius:9px;font-family:"Frank Ruhl Libre",serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.bs:hover{background:#2D2010;}
+.bs:disabled{opacity:.5;cursor:not-allowed;}
+
+/* IMAGE UPLOAD */
+.img-area{display:none;flex-direction:column;align-items:center;gap:12px;}
+.img-area.vis{display:flex;}
+.drop-zone{width:100%;border:2px dashed var(--br);border-radius:12px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gp);position:relative;}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--g);background:var(--gb);}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-icon{font-size:36px;margin-bottom:8px;}
+.drop-text{font-family:"Frank Ruhl Libre",serif;font-size:14px;font-weight:700;color:var(--inks);margin-bottom:4px;}
+.drop-sub{font-size:11.5px;color:#8A6A3A;}
+.preview-wrap{width:100%;position:relative;display:none;}
+.preview-wrap.vis{display:block;}
+.preview-img{max-width:100%;max-height:280px;border-radius:10px;border:2px solid var(--br);display:block;margin:0 auto;}
+.preview-clear{position:absolute;top:8px;left:8px;background:var(--rd);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.img-btn-row{display:flex;gap:8px;width:100%;}
+.img-btn-row .bs{flex:1;}
+.img-hint{font-size:11px;color:var(--inks);background:var(--gp);border:1px solid var(--br);border-radius:8px;padding:8px 12px;line-height:1.6;width:100%;}
+
+/* TEXT SEARCH */
+.text-area{display:none;flex-direction:column;gap:10px;}
+.text-area.vis{display:flex;}
+
+/* OUTPUT */
+#out{display:none;margin-bottom:20px;}
+#out.vis{display:block;}
+.out-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--br);}
+.out-title{font-family:"Frank Ruhl Libre",serif;font-size:15px;font-weight:700;}
+.out-title em{color:var(--g);font-style:normal;}
+.bn{padding:6px 12px;background:var(--gp);border:1px solid var(--br);border-radius:7px;font-size:11px;cursor:pointer;color:var(--inks);}
+.bn:hover{background:#E8C97A;}
+#stream-box{background:#fff;border:1px solid var(--br);border-radius:12px;padding:18px 20px;font-size:13px;line-height:1.85;color:var(--ink);min-height:80px;white-space:pre-wrap;word-break:break-word;}
+#stream-box.streaming::after{content:'▌';animation:blink .7s step-end infinite;color:var(--g);}
+@keyframes blink{50%{opacity:0;}}
+.slinks-title{font-size:11px;font-weight:700;color:var(--inks);margin:12px 0 6px;}
+.slinks{display:flex;flex-wrap:wrap;gap:6px;}
+.slink{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;background:var(--gp);border:1px solid var(--br);border-radius:7px;text-decoration:none;color:var(--inks);font-size:11px;transition:all .15s;}
+.slink:hover{background:#E8C97A;color:var(--ink);}
+
+/* LIBRARY PANEL */
+.lp{margin-top:26px;padding-top:16px;border-top:1px solid var(--br);transition:opacity .3s;}
+.lp-title{font-family:"Frank Ruhl Libre",serif;font-size:13px;font-weight:700;color:var(--inks);margin-bottom:10px;}
+.lp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:8px;}
+.lcat{background:#fff;border:1px solid var(--br);border-radius:9px;padding:10px 12px;}
+.lcat-t{font-size:11px;font-weight:700;color:var(--rd);margin-bottom:6px;}
+.lcat a{display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:var(--inks);font-size:10.5px;padding:3px 0;border-bottom:1px solid rgba(200,168,74,.15);transition:color .15s;}
+.lcat a:hover{color:var(--g);}
+.lcat a:last-child{border-bottom:none;}
+.lcat a span{font-size:9.5px;color:#9A7A3A;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="orn">✦ ✦ ✦</div>
+  <h1>חיפוש <em>ספר עברי</em> קדום</h1>
+  <p class="sub">חיפוש לפי שם ספר, מחבר, שנה — או העלאת תמונה לזיהוי הספר</p>
+  <div class="src-grid">
+    <span class="src-tag">📚 NLI / IMHM</span>
+    <span class="src-tag">🕍 JTS / Yeshiva University</span>
+    <span class="src-tag">🎓 Harvard · Yale · Princeton</span>
+    <span class="src-tag">🇬🇧 Bodleian · British Library</span>
+    <span class="src-tag">🇮🇹 ואטיקן · פרמה · פירנצה</span>
+    <span class="src-tag">🔨 Kedem · Winners · Sotheby's</span>
+  </div>
+</header>
+
+<!-- MODE TABS -->
+<div id="apiCard" style="background:#1a1008;border:2px solid var(--g);border-radius:12px;padding:14px 18px;margin-bottom:12px;">
+  <div style="font-family:'Frank Ruhl Libre',serif;font-size:13px;font-weight:700;color:var(--gl);margin-bottom:8px;">🔑 Anthropic API Key</div>
+  <div style="display:flex;gap:8px;">
+    <input type="password" id="apiKey" placeholder="sk-ant-api03-..." style="flex:1;padding:10px 12px;border:1.5px solid var(--br);border-radius:8px;font-family:monospace;font-size:12px;background:#2D2010;color:#E8C97A;outline:none;">
+    <button onclick="saveKey()" style="padding:10px 16px;background:var(--g);color:var(--ink);border:none;border-radius:8px;font-family:'Frank Ruhl Libre',serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">שמור ✓</button>
+  </div>
+  <div id="keyStatus" style="font-size:11px;color:#9A7A3A;margin-top:6px;">המפתח נשמר בדפדפן שלך בלבד</div>
+</div>
+
+<div class="modes">
+  <button class="mode on" id="modeText" onclick="setMode('text')">🔤 חיפוש לפי טקסט</button>
+  <button class="mode" id="modeImg" onclick="setMode('img')">📷 זיהוי לפי תמונה</button>
+</div>
+
+<div class="sc">
+
+  <!-- TEXT SEARCH -->
+  <div class="text-area vis" id="textArea">
+    <label class="sl">חפש ספר, מחבר, מדפיס, עיר דפוס, שנה:</label>
+    <div class="sr">
+      <input type="text" class="si" id="q"
+        placeholder='לדוגמה: ילקוט שמעוני סלוניקי 1521, נועם אלימלך, זוהר קרמונה...'
+        onkeydown="if(event.key==='Enter')doTextSearch()">
+      <button class="bs" id="btnText" onclick="doTextSearch()">חפש 🔍</button>
+    </div>
+  </div>
+
+  <!-- IMAGE SEARCH -->
+  <div class="img-area" id="imgArea">
+    <label class="sl">צלם או בחר תמונה של עמוד השער:</label>
+
+    <!-- Two big buttons -->
+    <div id="uploadBtns" style="display:flex;gap:10px;width:100%;">
+      <!-- Camera -->
+      <label style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:22px 10px;background:var(--ink);color:var(--gl);border-radius:12px;cursor:pointer;font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:14px;">
+        <span style="font-size:32px;">📷</span>
+        מצלמה
+        <input type="file" accept="image/*" capture="camera" style="display:none" onchange="if(this.files&&this.files[0])handleFile(this.files[0])">
+      </label>
+      <!-- Gallery -->
+      <label style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:22px 10px;background:var(--gp);border:2px solid var(--br);border-radius:12px;cursor:pointer;font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:14px;color:var(--inks);">
+        <span style="font-size:32px;">🖼️</span>
+        גלריה
+        <input type="file" accept="image/*" style="display:none" onchange="if(this.files&&this.files[0])handleFile(this.files[0])">
+      </label>
+    </div>
+
+    <div class="preview-wrap" id="previewWrap">
+      <img id="previewImg" class="preview-img" src="" alt="תצוגה מקדימה">
+      <button class="preview-clear" onclick="clearImg()" title="הסר תמונה">×</button>
+    </div>
+
+    <div class="img-hint">
+      💡 <strong>טיפ:</strong> תמונה של עמוד השער נותנת את התוצאות הטובות ביותר. גם כריכה, כולמוס, או כל עמוד עם טקסט עברי יעבדו.
+    </div>
+
+    <div class="img-btn-row">
+      <button class="bs" id="btnImg" onclick="doImgSearch()" disabled style="opacity:0.4;transition:opacity .3s;">זהה ספר 🔍</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- OUTPUT -->
+<div id="out">
+  <div class="out-hdr">
+    <div class="out-title" id="outTitle">תוצאות</div>
+    <button class="bn" onclick="reset()">חיפוש חדש</button>
+  </div>
+  <div id="stream-box"></div>
+  <div id="search-links"></div>
+</div>
+
+<!-- LIBRARY PANEL -->
+<div class="lp" id="lp">
+  <div class="lp-title">🔗 ספריות ומאגרים — חיפוש ישיר</div>
+  <div class="lp-grid">
+
+    <div class="lcat">
+      <div class="lcat-t">🇮🇱 ישראל</div>
+      <a href="https://www.nli.org.il/he/discover" target="_blank">הספרייה הלאומית (NLI) <span>מאגר IMHM</span></a>
+      <a href="https://hebrewbooks.org" target="_blank">HebrewBooks.org <span>ספרים דיגיטליים</span></a>
+      <a href="https://jnul.huji.ac.il" target="_blank">ספריית הר הצופים <span>האוניברסיטה העברית</span></a>
+    </div>
+
+    <div class="lcat">
+      <div class="lcat-t">🇺🇸 ניו יורק</div>
+      <a href="https://www.jtsa.edu/library" target="_blank">Jewish Theological Seminary <span>JTS</span></a>
+      <a href="https://www.yu.edu/libraries" target="_blank">Yeshiva University <span>Mendel Gottesman</span></a>
+      <a href="https://catalog.nypl.org" target="_blank">New York Public Library <span>NYPL</span></a>
+      <a href="https://library.columbia.edu" target="_blank">Columbia University <span>Butler Library</span></a>
+      <a href="https://library.yivo.org" target="_blank">YIVO Institute <span>יידיש ויהדות</span></a>
+    </div>
+
+    <div class="lcat">
+      <div class="lcat-t">🇺🇸 אוניברסיטאות</div>
+      <a href="https://library.harvard.edu" target="_blank">Harvard University <span>Houghton Library</span></a>
+      <a href="https://beinecke.library.yale.edu" target="_blank">Yale University <span>Beinecke Library</span></a>
+      <a href="https://library.princeton.edu" target="_blank">Princeton University <span>Firestone Library</span></a>
+      <a href="https://www.lib.uchicago.edu" target="_blank">University of Chicago <span>Regenstein</span></a>
+      <a href="https://www.library.upenn.edu" target="_blank">University of Pennsylvania <span>Katz Center</span></a>
+      <a href="https://lib.berkeley.edu" target="_blank">UC Berkeley <span>Bancroft Library</span></a>
+      <a href="https://www.brandeis.edu/library" target="_blank">Brandeis University <span>Goldfarb Library</span></a>
+    </div>
+
+    <div class="lcat">
+      <div class="lcat-t">🇬🇧 בריטניה</div>
+      <a href="https://www.bl.uk" target="_blank">British Library <span>Hebraica</span></a>
+      <a href="https://www.bodleian.ox.ac.uk" target="_blank">Bodleian Library Oxford <span>אוסף עברי גדול</span></a>
+      <a href="https://www.lib.cam.ac.uk" target="_blank">Cambridge University <span>Taylor-Schechter</span></a>
+    </div>
+
+    <div class="lcat">
+      <div class="lcat-t">🇮🇹 איטליה</div>
+      <a href="https://www.vaticanlibrary.va" target="_blank">Biblioteca Apostolica Vaticana <span>ואטיקן</span></a>
+      <a href="https://www.bncf.firenze.sbn.it" target="_blank">Biblioteca Nazionale Firenze <span>פירנצה</span></a>
+      <a href="https://www.bibliotecaestense.unimore.it" target="_blank">Biblioteca Estense Modena <span>מודנה</span></a>
+      <a href="https://www.bibliotecaambrosiana.it" target="_blank">Biblioteca Ambrosiana <span>מילנו</span></a>
+      <a href="https://www.palazzopilotta.it/biblioteche" target="_blank">Palatina Parma <span>De Rossi Collection</span></a>
+      <a href="https://www.marciana.venezia.sbn.it" target="_blank">Biblioteca Marciana <span>ונציה</span></a>
+      <a href="https://bnnonline.it" target="_blank">Biblioteca Nazionale Napoli <span>נאפולי</span></a>
+    </div>
+
+    <div class="lcat">
+      <div class="lcat-t">🇩🇪 🇦🇹 גרמניה ואוסטריה</div>
+      <a href="https://www.bsb-muenchen.de" target="_blank">Bayerische Staatsbibliothek <span>מינכן</span></a>
+      <a href="https://www.dnb.de" target="_blank">Deutsche Nationalbibliothek <span>פרנקפורט</span></a>
+      <a href="https://www.sub.uni-hamburg.de" target="_blank">SUB Hamburg <span>המבורג</span></a>
+      <a href="https://www.onb.ac.at" target="_blank">Österreichische Nationalbibliothek <span>וינה</span></a>
+      <a href="https://www.ub.uni-frankfurt.de" target="_blank">UB Frankfurt <span>Judaica</span></a>
+    </div>
+
+    <div class="lcat">
+      <div class="lcat-t">🌍 אירופה</div>
+      <a href="https://www.bnf.fr" target="_blank">Bibliothèque nationale de France <span>פריז</span></a>
+      <a href="https://www.kb.nl" target="_blank">Koninklijke Bibliotheek <span>האג</span></a>
+      <a href="https://www.uba.uva.nl/en/collections/special-collections" target="_blank">Bibliotheca Rosenthaliana <span>אמסטרדם</span></a>
+      <a href="https://www.rsl.ru" target="_blank">Russian State Library <span>מוסקבה</span></a>
+      <a href="https://www.nlr.ru" target="_blank">National Library of Russia <span>סנט פטרסבורג</span></a>
+    </div>
+
+    <div class="lcat">
+      <div class="lcat-t">🔨 מכירות פומביות</div>
+      <a href="https://www.kedem-auctions.com" target="_blank">Kedem Auctions <span>ישראל</span></a>
+      <a href="https://www.winners.co.il" target="_blank">Winners Auctions <span>ישראל</span></a>
+      <a href="https://www.genazym.com" target="_blank">Genazym <span>מסמכים ואוטוגרפים</span></a>
+      <a href="https://www.sothebys.com/en/buy/books-manuscripts" target="_blank">Sotheby's <span>Books & MSS</span></a>
+      <a href="https://www.christies.com/departments/Books-and-Manuscripts" target="_blank">Christie's <span>Books & MSS</span></a>
+      <a href="https://www.kestenbaum.net" target="_blank">Kestenbaum & Co. <span>יודאיקה</span></a>
+      <a href="https://www.bloomberman.com" target="_blank">Bloomberman <span>ספרים נדירים</span></a>
+    </div>
+
+    <div class="lcat">
+      <div class="lcat-t">🌐 מאגרים בינלאומיים</div>
+      <a href="https://www.worldcat.org" target="_blank">WorldCat <span>מאגר ספריות עולמי</span></a>
+      <a href="https://beta.worldcat.org/archivegrid" target="_blank">ArchiveGrid <span>ארכיונים</span></a>
+      <a href="https://www.europeana.eu" target="_blank">Europeana <span>מורשת אירופה</span></a>
+      <a href="https://www.loc.gov/collections" target="_blank">Library of Congress <span>וושינגטון</span></a>
+    </div>
+
+  </div>
+</div>
+
+</div>
+<script>
+let currentMode = 'text';
+let imgBase64 = null;
+let imgMime = null;
+
+function setMode(m) {
+  currentMode = m;
+  document.getElementById('modeText').classList.toggle('on', m==='text');
+  document.getElementById('modeImg').classList.toggle('on', m==='img');
+  document.getElementById('textArea').classList.toggle('vis', m==='text');
+  document.getElementById('imgArea').classList.toggle('vis', m==='img');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) handleFile(f);
+}
+
+function enableImgBtn() {
+  const btn = document.getElementById('btnImg');
+  btn.disabled = false;
+  btn.removeAttribute('disabled');
+  btn.style.opacity = '1';
+  btn.style.background = 'var(--ink)';
+  btn.style.cursor = 'pointer';
+  btn.style.pointerEvents = 'auto';
+}
+
+function handleFile(f) {
+  if (!f) return;
+
+  const MAX_PX = 1400;
+  const MAX_BYTES = 4 * 1024 * 1024;
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > MAX_PX || h > MAX_PX) {
+        if (w > h) { h = Math.round(h * MAX_PX / w); w = MAX_PX; }
+        else { w = Math.round(w * MAX_PX / h); h = MAX_PX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+      let quality = 0.85;
+      let dataUrl = canvas.toDataURL('image/jpeg', quality);
+      while (dataUrl.length * 0.75 > MAX_BYTES && quality > 0.3) {
+        quality -= 0.1;
+        dataUrl = canvas.toDataURL('image/jpeg', quality);
+      }
+
+      imgBase64 = dataUrl.split(',')[1];
+      imgMime = 'image/jpeg';
+
+      document.getElementById('previewImg').src = dataUrl;
+      document.getElementById('previewWrap').classList.add('vis');
+      document.getElementById('uploadBtns').style.display = 'none';
+      enableImgBtn();
+    };
+    img.onerror = () => alert('לא ניתן לטעון את התמונה. נסה קובץ אחר.');
+    img.src = ev.target.result;
+  };
+  reader.onerror = () => alert('שגיאה בקריאת הקובץ.');
+  reader.readAsDataURL(f);
+}
+
+function clearImg() {
+  imgBase64 = null; imgMime = null;
+  document.getElementById('previewWrap').classList.remove('vis');
+  document.getElementById('dropZone').style.display = '';
+  document.getElementById('btnImg').disabled = true;
+  document.getElementById('previewImg').src = '';
+}
+
+function buildTextPrompt(q) {
+  return `אתה מומחה בכיר לספרים עבריים נדירים, ביבליוגרפיה עברית, היסטוריה של הדפוס העברי ומכירות פומביות של יודאיקה.
+
+המשתמש מחפש: "${q}"
+
+ספק מידע ביבליוגרפי ספציפי ומועיל בעברית. המבנה:
+
+**שם הספר ומחבר**
+שם מלא, מחבר, תיאור קצר של תוכן וחשיבות.
+
+**מהדורות עיקריות**
+כל מהדורה: שנה, עיר, מדפיס, נדירות, ערך שוק משוער.
+
+**ספריות ואוספים**
+ספריות עם עותקים ידועים: NLI, JTS, Yeshiva University, Harvard, Yale, Princeton, Oxford Bodleian, British Library, Vatican, Palatina Parma, Rosenthaliana Amsterdam, BnF Paris ועוד. ציין מספרי קטלוג אם ידועים.
+
+**מכירות פומביות**
+מכירות מתועדות: Kedem, Winners, Sotheby's, Christie's, Kestenbaum — שנים ומחירים אם ידועים.
+
+**ביבליוגרפיה**
+מספרי ביבליוגרפיה: ויסמן, סטפנסקי, Offenberg, GKW.
+
+**קישורים לסריקות דיגיטליות**
+אם ידועים — קישורים לסריקות ב-HebrewBooks, NLI, Europeana, BSB, BnF Gallica וכו'.
+
+**הערת מהימנות**
+מה בטוח ומה כדאי לאמת.
+
+כלל: אל תמציא פרטים. אם אינך בטוח — אמור זאת.`;
+}
+
+function buildImgPrompt() {
+  return `אתה מומחה בכיר לספרים עבריים נדירים, כתבי יד עבריים, ביבליוגרפיה עברית, ופליאוגרפיה עברית.
+
+קיבלת תמונה של ספר עברי — עמוד שער, כריכה, או עמוד פנימי.
+
+**שלב 1 — קריאת הטקסט:**
+קרא בעיון את כל הטקסט הנראה בתמונה. תעתק אותו מילה במילה ככל האפשר, כולל:
+- שם הספר
+- שם המחבר
+- עיר הדפוס
+- שם המדפיס
+- שנת הדפוס (גם בגימטריה)
+- כל טקסט נוסף על עמוד השער
+
+**שלב 2 — זיהוי הספר:**
+על סמך הטקסט שקראת — זהה את הספר:
+- שם הספר המדויק
+- המחבר
+- המהדורה הספציפית (שנה, עיר, מדפיס)
+
+**שלב 3 — מידע ביבליוגרפי:**
+ספק מידע על הספר המזוהה:
+- נדירות ומספר עותקים ידוע
+- ספריות שמחזיקות עותקים: NLI, JTS, Yeshiva University, Harvard, Bodleian, Vatican, Parma, BnF וכו'
+- מכירות פומביות מתועדות (Kedem, Winners, Sotheby's) עם מחירים אם ידועים
+- ערך שוק משוער
+
+**שלב 4 — קישורים לסריקות:**
+אם ידועים — ציין היכן ניתן למצוא סריקות דיגיטליות של הספר.
+
+**הערה:** אם הטקסט לא ברור — תאר מה שאתה רואה ונסה לזהות סוג הכתב (רש"י, מרובע, חצי קולמוס) ותקופת הדפוס לפי המראה.`;
+}
+
+async function stream(messages, titleText) {
+  document.getElementById('lp').style.opacity = '.35';
+  document.getElementById('out').classList.add('vis');
+  document.getElementById('outTitle').innerHTML = titleText;
+  document.getElementById('search-links').innerHTML = '';
+
+  const box = document.getElementById('stream-box');
+  box.textContent = '';
+  box.classList.add('streaming');
+
+  try {
+    const apiKey = localStorage.getItem('anthropic_key');
+    if (!apiKey) {
+      box.textContent = 'שגיאה: לא הוזן API Key. אנא הכנס את המפתח בשדה למעלה ולחץ שמור.';
+      box.classList.remove('streaming');
+      document.getElementById('lp').style.opacity = '1';
+      return;
+    }
+
+    const resp = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 1500,
+        messages
+      })
+    });
+
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    let fullText = data.content?.[0]?.text || '';
+    box.textContent = fullText;
+    box.classList.remove('streaming');
+
+    // Extract book name for search links
+    const nameMatch = fullText.match(/\*\*שם הספר[^*]*\*\*\s*\n([^\n]+)/);
+    const searchQ = nameMatch ? nameMatch[1].trim() : document.getElementById('q').value || '';
+    showSearchLinks(searchQ);
+
+  } catch(err) {
+    box.classList.remove('streaming');
+    box.textContent = `שגיאה: ${err.message}`;
+  }
+
+  document.getElementById('lp').style.opacity = '1';
+}
+
+async function doTextSearch() {
+  const q = document.getElementById('q').value.trim();
+  if (!q) return;
+  document.getElementById('btnText').disabled = true;
+  await stream(
+    [{role:'user', content: buildTextPrompt(q)}],
+    `תוצאות עבור: <em>${q}</em>`
+  );
+  document.getElementById('btnText').disabled = false;
+}
+
+async function doImgSearch() {
+  if (!imgBase64) return;
+  document.getElementById('btnImg').disabled = true;
+  await stream(
+    [{role:'user', content:[
+      {type:'image', source:{type:'base64', media_type: imgMime||'image/jpeg', data: imgBase64}},
+      {type:'text', text: buildImgPrompt()}
+    ]}],
+    '🔍 זיהוי ספר מתמונה'
+  );
+  document.getElementById('btnImg').disabled = false;
+}
+
+function showSearchLinks(q) {
+  if (!q) return;
+  const enc = encodeURIComponent(q);
+  const links = [
+    ['📖 HebrewBooks',  `https://hebrewbooks.org/search.aspx?req=${enc}&start=1`],
+    ['📚 NLI',          `https://www.nli.org.il/he/discover?query=${enc}`],
+    ['🌍 WorldCat',     `https://www.worldcat.org/search?q=${enc}`],
+    ['🔨 Kedem',        `https://www.kedem-auctions.com/en/results/?keyword=${enc}`],
+    ['🔨 Winners',      `https://www.winners.co.il/Search?SearchText=${enc}`],
+    ['🏛️ Sotheby\'s',  `https://www.sothebys.com/en/results?q=${enc}`],
+    ['🎓 Bodleian',     `https://solo.bodleian.ox.ac.uk/primo-explore/search?query=any,contains,${enc}&vid=OXFORD`],
+    ['🕍 JTS',          `https://catalog.jtsa.edu/search?q=${enc}`],
+    ['🗂️ ArchiveGrid', `https://beta.worldcat.org/archivegrid/?q=${enc}`],
+    ['🇮🇹 Europeana',  `https://www.europeana.eu/en/search?query=${enc}&qf=LANGUAGE%3Ahe`],
+  ];
+  document.getElementById('search-links').innerHTML =
+    `<div class="slinks-title">🔗 חפש ישירות במקורות:</div><div class="slinks">` +
+    links.map(([l,u])=>`<a class="slink" href="${u}" target="_blank">${l}</a>`).join('') +
+    `</div>`;
+}
+
+function saveKey() {
+  const k = document.getElementById('apiKey').value.trim();
+  if (k) {
+    localStorage.setItem('anthropic_key', k);
+    document.getElementById('apiCard').style.borderColor = '#2ecc71';
+    document.getElementById('apiCard').style.background = '#0d2b1a';
+    document.getElementById('keyStatus').textContent = '✓ המפתח נשמר בהצלחה';
+    document.getElementById('keyStatus').style.color = '#2ecc71';
+  }
+}
+
+// Load saved key on startup
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('anthropic_key');
+  if (saved) {
+    document.getElementById('apiKey').value = saved;
+    document.getElementById('apiCard').style.borderColor = '#2ecc71';
+    document.getElementById('apiCard').style.background = '#0d2b1a';
+    document.getElementById('keyStatus').textContent = '✓ המפתח נשמר בהצלחה';
+    document.getElementById('keyStatus').style.color = '#2ecc71';
+  }
+});
+
+function reset() {
+  document.getElementById('out').classList.remove('vis');
+  document.getElementById('q').value = '';
+  clearImg();
+  setMode('text');
+  document.getElementById('q').focus();
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
